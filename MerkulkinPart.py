@@ -15,14 +15,18 @@ Adress = "не заполнено"
 commands = ["/start", "/options"]
 def options(message):
     print(surName, firstName, middleName)
+
+    bot.send_message(message.chat.id, text['chooseSymptomes'],reply_markup=keyboard.choose_symptome())
     bot.send_message(message.from_user.id, text['info']
                      +"\n"+text['surname']+surName+'\n'+text['firstname']+firstName+'\n'+
                      text['middlename']+middleName+'\n'+text['age']+Age)
+
+
 @bot.message_handler(commands=['start'])
 def getTextMessages(message):
     global typed
     bot.send_message(message.from_user.id, text["greet"])
-    bot.register_next_step_handler(message, Get_FIO)
+    bot.register_next_step_handler(message, options)
 
 def Get_FIO(message):
     global middleName, firstName, surName
@@ -34,13 +38,14 @@ def Get_FIO(message):
                 firstName = Message[1]
                 try:
                     middleName = Message[2]
-                    options
+
                 except:
                     middleName = 'не заполнено'
                     surName = 'не заполнено'
                     firstName = 'не заполнено'
                     bot.send_message(message.from_user.id, text['wrongMiddlenameInput'])
                     bot.register_next_step_handler(message, Get_FIO)
+                options(message)
             except:
                 middleName = 'не заполнено'
                 surName = 'не заполнено'
