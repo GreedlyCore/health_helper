@@ -1,27 +1,28 @@
+from telebot import  *
 import telebot
-from Include.sql import article_db
 from keyboards import *
-from bs4 import BeautifulSoup
-import requests as rq
-from sd_parser import *
-from fake_headers import Headers
-from random import choice, randint
-from const import *
 from text import text
 from os import getcwd
-from datetime import datetime
-from time import time
-import mysql.connector as sql
-from sql import *
+#from Include.sql import article_db
+#from bs4 import BeautifulSoup
+#import requests as rq
+#from sd_parser import *
+#from fake_headers import Headers
+#from random import choice, randint
+#from const import *
+#from datetime import datetime
+#from time import time
+#import mysql.connector as sql
+#from sql import *
 
-header = Headers(
-    browser="chrome",  # Generate only Chrome UA
-    os="win",  # Generate ony Windows platform
-    headers=True  # generate misc headers
-)
+#header = Headers(
+#    browser="chrome",  # Generate only Chrome UA
+#    os="win",  # Generate ony Windows platform
+#    headers=True  # generate misc headers
+#)
 
-
-
+file = open("TOKEN", "r")
+TOKEN = file.read()
 bot = telebot.TeleBot(TOKEN)
 
 
