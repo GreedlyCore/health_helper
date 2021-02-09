@@ -4,10 +4,9 @@ class user:
         self.surname = None
         self.middleName = None
         self.age = None
-        self.symptomes = []
+        self.symptomes = None
         self.address = None
         self.gender = None
-        self.diseases = []
     def setSurname(self, surname):
         self.surname = surname
     def setName(self, name):
@@ -15,13 +14,11 @@ class user:
     def setMiddleName(self, middleName):
         self.middleName = middleName
     def setAge(self, age):
-        self.age = age
+        self.middleName = age
     def setAddress(self, address):
         self.address = address
-    def setSymptomes(self, symptomes):
+    def setMiddleName(self, symptomes):
         self.symptomes = symptomes
-    def setDiseases(self, diseases):
-        self.diseases = diseases
     def setGender(self, gender):
         self.gender = gender
 
@@ -37,7 +34,5 @@ class user:
         return self.address
     def getSymptomes(self):
         return self.symptomes
-    def getDiseases(self):
-        return self.diseases
     def getGender(self):
         return self.gender
