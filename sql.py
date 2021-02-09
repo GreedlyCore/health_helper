@@ -1,6 +1,6 @@
 import mysql.connector as sql
 from datetime import datetime
-from sd_parser import *
+
 from random import sample
 from time import time
 from const import *
