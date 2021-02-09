@@ -1,18 +1,13 @@
-# import telebot
-# from Include.sql import article_db
-# from keyboards import *
-# from bs4 import BeautifulSoup
-# import requests as rq
-# from sd_parser import *
-# from fake_headers import Headers
+
+from keyboards import *
+
 # from random import choice, randint
-# from const import *
-# from text import text
-# from os import getcwd
-# from datetime import datetime
+from const import *
+
 # from time import time
-# import mysql.connector as sql
-# from sql import *
+import mysql.connector as sql
+#pip install mysql-connector-python
+from sql import *
 
 from telebot import  *
 import telebot
@@ -20,18 +15,13 @@ from keyboards import *
 from text import text
 from os import getcwd
 from user import user
+from datetime import datetime
+
 
 
 bot = telebot.TeleBot(TOKEN)
 
-class user:
-    def __init__(self, name, surname, patronymic, age, symptoms, address):
-        self.name = 'не заполнено'
-        self.surname = 'не заполнено'
-        self.patronymic = 'не заполнено'
-        self.age = 'не заполнено'
-        self.symptoms = 'не заполнено'
-        self.address = "не заполнено"
+
 user = user()
 
 
@@ -60,6 +50,7 @@ def main(message):
         bot.register_next_step_handler(sent, getInitials)
         user_db.create(message.chat.id, user.getName(), user.getSurname(), user.getMiddleName(), user.getAge(),
                        diseases, user.getGender())
+
 
     bot.register_next_step_handler(sent, menu_selector)
 
@@ -147,8 +138,6 @@ def getInitials(message):
     else:
         bot.send_message(message.from_user.id, text['wrongMessageInput'])
         bot.register_next_step_handler(message, getInitials)
-
-
 
 
 

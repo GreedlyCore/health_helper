@@ -1,9 +1,9 @@
 import mysql.connector as sql
 from datetime import datetime
-from sd_parser import *
+
 from random import sample
 from time import time
-from const import *
+from const import DATABASE
 
 
 
@@ -25,7 +25,7 @@ class user_db:
     def create_report(id, name, surname, middlename, age, diseases, gender):
         cursor = user_db.mydb.cursor()
         sql = "INSERT INTO reports (id_tg, name, surname, middlename, age, diseases, gender, time) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
-        val = (id, name, surname, middlename, age, gender, DATETIME!!)
+        val = (id, name, surname, middlename, age, gender, datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
         mycursor.execute(sql, val)
         user_db.mydb.commit()
 
