@@ -49,3 +49,11 @@ class keyboard:
     def gender():
         Array = [[InlineKeyboardButton("Мужской", callback_data=1),
                  InlineKeyboardButton("Женский", callback_data=0),]]
+        return InlineKeyboardMarkup(Array)
+    @staticmethod
+    def correctInfo():
+        Array = [[InlineKeyboardButton("Yes", callback_data="True"),
+                 InlineKeyboardButton("No", callback_data="False"),]]
+
+
+        return InlineKeyboardMarkup(Array)
