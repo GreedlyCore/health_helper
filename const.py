@@ -8,3 +8,4 @@ DATABASE = sql.connect(
     password="12345",#password="123456789bb",
     database="sys"
 )
+DOCTOR_CHATS_ID = [426578062]

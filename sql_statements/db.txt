@@ -1,0 +1,23 @@
+CREATE TABLE `requests` (
+  `ID` int NOT NULL,
+  `id_tg` varchar(45) DEFAULT NULL,
+  `name` varchar(45) DEFAULT NULL,
+  `surname` varchar(45) DEFAULT NULL,
+  `middlename` varchar(45) DEFAULT NULL,
+  `age` tinyint DEFAULT NULL,
+  `diseases` varchar(45) DEFAULT NULL,
+  `gender` tinyint DEFAULT NULL,
+  `time` varchar(45) DEFAULT NULL,
+  `place` varchar(150) DEFAULT NULL,
+  PRIMARY KEY (`ID`)
+)
+
+CREATE TABLE `users` (
+  `id_tg` varchar(45) NOT NULL,
+  `name` varchar(45) DEFAULT NULL,
+  `surname` varchar(45) DEFAULT NULL,
+  `middlename` varchar(45) DEFAULT NULL,
+  `age` tinyint DEFAULT NULL,
+  `gender` tinyint DEFAULT NULL
+)
+

@@ -6,31 +6,43 @@ class keyboard:
     @staticmethod
     def choose_symptome():
         Array = list()
-        list_kb = list()
+        list_kb = InlineKeyboardMarkup()
+
         for i in range(len(symptomes)):
             Array.append(InlineKeyboardButton(symptomes[i], callback_data="1"+symptomes[i]))
             if not ((i+1) % 3):
-                list_kb.append(Array)
+                list_kb.row(Array[0], Array[1], Array[2])
                 Array = []
-        if Array not in list_kb:
-            list_kb.append(Array)
 
-        return InlineKeyboardMarkup(list_kb)
+        return list_kb
+
+        # keyboard = InlineKeyboardMarkup()
+        # keyboard.row(
+        #     InlineKeyboardButton(symptomes[0], callback_data=symptomes[0]),
+        #     InlineKeyboardButton(symptomes[1], callback_data=symptomes[1]),
+        #     InlineKeyboardButton(symptomes[2], callback_data=symptomes[2]),
+        # )
+        # keyboard.row(
+        #     InlineKeyboardButton('EUR', callback_data='get-EUR'),
+        #     InlineKeyboardButton('RUR', callback_data='get-RUR'),
+        # #     InlineKeyboardButton('RUR', callback_data='get-RUR'),
+        # # )
+        # return keyboard
 
 
     @staticmethod
     def choose_diseases():
         Array = list()
-        list_kb = list()
-        for i in range(len(diseases)):
-            Array.append(InlineKeyboardButton(diseases[i], callback_data="0" + diseases[i]))
-            if not ((i + 1) % 3):
-                list_kb.append(Array)
-                Array = []
-        if Array not in list_kb:
-            list_kb.append(Array)
+        list_kb = InlineKeyboardMarkup()
 
-        return InlineKeyboardMarkup(list_kb)
+        for i in range(len(diseases)):
+            Array.append(InlineKeyboardButton(diseases[i], callback_data="0"+diseases[i]))
+            if not ((i+1) % 3):
+                list_kb.row(Array[0], Array[1], Array[2])
+                Array = []
+
+        return list_kb
+
     @staticmethod
     def main():
        kb = ReplyKeyboardMarkup(True)

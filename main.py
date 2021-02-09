@@ -1,15 +1,14 @@
 
 from random import choice, randint
-import mysql.connector as sql
-from telebot import  *
 import telebot
+#from telebot import  *
 from keyboards import *
 from text import text
-from os import getcwd
 from user import user
 from const import *
 import mysql.connector as sql
-from sql import *
+from sql_requests import *
+from geo import geo_to_url
 bot = telebot.TeleBot(TOKEN)
 
 user = user()
@@ -18,12 +17,11 @@ user = user()
 bot = telebot.TeleBot(TOKEN)
 
 # многоразовый отклик на кнопки в клаве
-# 1 = симптом
-# 0 = заболевание и весь спектр трамв
-
 @bot.callback_query_handler(func=lambda call: True)
 def callback_query(call):
     bot.answer_callback_query(callback_query_id=call.id, text=choice(text['rated_callback']))
+    # 1 = симптом
+    # 0 = заболевание и весь спектр трамв
     if call.data[0] == '1':
         user.setSymptomes(user.getSymptomes()+[call.data[1:]])
     elif call.data[0] == "0":
@@ -35,16 +33,13 @@ def callback_query(call):
 @bot.message_handler(commands=['start'])
 def main(message):
 
-    # register for new users
-
-    #message.json['from']['id']
-    if message.json['from']['id'] not in user_db.get_users_id():
-    #-----------------------------------------------------REGISTRATION---------------------------------------------#
+    # registration for new users
+    if str(message.json['from']['id']) not in user_db.get_users_id():
         sent = bot.send_message(message.chat.id, text['greet_new'])
         bot.register_next_step_handler(sent, getInitials)
         print('User created')
     else:
-        sent = bot.send_message(message.chat.id, text['greet_old_beginning']+user_db.getName(message.chat.id)+text['greet_old_ending'])
+        sent = bot.send_message(message.chat.id, text['greet_old_beginning']+user_db.getName(message.json['from']['id'])+text['greet_old_ending'])
         bot.register_next_step_handler(sent, menu_selector)
 
 
@@ -54,7 +49,7 @@ def symptomes_input(message):
         sent = bot.send_message(message.chat.id, text['chooseDiseases'], reply_markup=keyboard.choose_diseases())
         bot.register_next_step_handler(sent, diseases_input)
     else:
-        user.setSymptomes(user.getSymptomes()+message.text.split(', '))
+        sent = user.setSymptomes(user.getSymptomes()+message.text.split(', '))
         bot.register_next_step_handler(sent, symptomes_input)
 
 def diseases_input(message):
@@ -63,21 +58,11 @@ def diseases_input(message):
         bot.register_next_step_handler(sent, geo_input)
 
     else:
-        user.setDiseases(user.getDiseases() + message.text.split(', '))
+        sent = user.setDiseases(user.getDiseases() + message.text.split(', '))
         bot.register_next_step_handler(sent, diseases_input)
 
 
-@bot.message_handler(content_types=["location"])
-def geo_input(message):
-    if message.location is not None:
-        print(message.location)
-        print("latitude: %s; longitude: %s" % (message.location.latitude, message.location.longitude)) #широта долгота
-        user.setAddress([message.location.latitude, message.location.longitude])
-        id = message.json['from']['id']
-        user_db.create_request(id, user_db.getName(id), user_db.getSurName(id), user_db.getMiddleName(id), user_db.getAge(id), user.getSymptomes(), user.getDiseases(), [message.location.latitude, message.location.longitude])
-    else:
-        sent = bot.send_message(message.chat.id, text['NoneGeo'])
-        bot.register_next_step_handler(sent, geo_input)
+
 
 
 
@@ -127,6 +112,39 @@ def getGender(message):
     else:
         bot.send_message(message.from_user.id, text['wrongMessageInput'])
         bot.register_next_step_handler(message, getGender)
+
+
+@bot.message_handler(content_types=["location"])
+def geo_input(message):
+    if message.location is not None:
+        # широта долгота
+        ID = str(message.json['from']['id'])
+        info = user_db.getMainInfo(str(message.json['from']['id']))
+#         info = {'name':'Валерий', 'surname':"Павлов", "middlename":"Петрович", "gender":"мужской","age":25}
+
+        geo = geo_to_url(message.location.latitude, message.location.longitude)
+        #unworking
+        user_db.create_request(ID, info['name'], info['surname'], info['middlename'],
+                               info['age'], info['gender'], user.getSymptomes(), user.getDiseases(),
+                               geo)
+        sent = bot.send_message(message.chat.id, text['request_sended'])
+        for DR in DOCTOR_CHATS_ID:
+            bot.send_message(DR, f"{text['new_request']} \n\n "
+                                 f"{text['surname']} {info['surname']}\n"
+                                 f"{text['firstname']}{info['name']} \n"
+                                 f"{text['middlename']}{info['middlename']}\n"
+                                 f"{text['age']} {info['age']}\n"
+                                 f"{text['gender']}{info['gender']}\n\n"
+                                 f"Жалобы/травмы:{' '.join(user.getDiseases())}\n\n"
+                                 f"Симптомы:{' '.join(user.getSymptomes())}\n\n"
+                                 f"Местоположение:\n{geo}")
+
+
+        bot.register_next_step_handler(sent, menu_selector)
+
+    else:
+        sent = bot.send_message(message.chat.id, text['NoneGeo'])
+        bot.register_next_step_handler(sent, geo_input)
 
 def getAge(message):
     if 130 >= int(message.text) > 0 and type(eval(message.text)) !=float:
