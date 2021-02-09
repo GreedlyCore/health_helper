@@ -1,48 +1,36 @@
-# import telebot
-# from Include.sql import article_db
-# from keyboards import *
-# from bs4 import BeautifulSoup
-# import requests as rq
-# from sd_parser import *
-# from fake_headers import Headers
-# from random import choice, randint
-# from const import *
-# from text import text
-# from os import getcwd
-# from datetime import datetime
-# from time import time
-# import mysql.connector as sql
-# from sql import *
 
+from random import choice, randint
+import mysql.connector as sql
 from telebot import  *
 import telebot
 from keyboards import *
 from text import text
 from os import getcwd
 from user import user
+from const import *
+import mysql.connector as sql
+from sql import *
+bot = telebot.TeleBot(TOKEN)
+
+user = user()
 
 
 bot = telebot.TeleBot(TOKEN)
 
-class user:
-    def __init__(self, name, surname, patronymic, age, symptoms, address):
-        self.name = 'не заполнено'
-        self.surname = 'не заполнено'
-        self.patronymic = 'не заполнено'
-        self.age = 'не заполнено'
-        self.symptoms = 'не заполнено'
-        self.address = "не заполнено"
-user = user()
-
-
 # многоразовый отклик на кнопки в клаве
+# 1 = симптом
+# 0 = заболевание и весь спектр трамв
+
 @bot.callback_query_handler(func=lambda call: True)
 def callback_query(call):
     bot.answer_callback_query(callback_query_id=call.id, text=choice(text['rated_callback']))
+    if call.data[0] == '1':
+        user.setSymptomes(user.getSymptomes()+[call.data[1:]])
+    elif call.data[0] == "0":
+        user.setDiseases(user.getDiseases()+[call.data[1:]])
+    print(user.getSymptomes())
+    print(user.getDiseases())
 
-    mark = float(call.data.split()[0])
-    theme = call.data.split()[1:-1]
-    article_id = call.data.split()[-1]
 
 
 
@@ -52,16 +40,52 @@ def callback_query(call):
 @bot.message_handler(commands=['start'])
 def main(message):
 
-
     # register for new users
     if message.chat.id not in user_db.get_users_id():
-        #-----------------------------------------------------REGISTRATION---------------------------------------------#
-        sent = bot.send_message(message.chat.id, text['greet'])
+    #-----------------------------------------------------REGISTRATION---------------------------------------------#
+        sent = bot.send_message(message.chat.id, text['greet_new'])
         bot.register_next_step_handler(sent, getInitials)
-        user_db.create(message.chat.id, user.getName(), user.getSurname(), user.getMiddleName(), user.getAge(),
-                       diseases, user.getGender())
 
-    bot.register_next_step_handler(sent, menu_selector)
+        print('Success')
+    else:
+        sent = bot.send_message(message.chat.id, text['greet_old_beginning']+user_db.getName(message.chat.id)+text['greet_old_ending'])
+
+        bot.register_next_step_handler(sent, menu_selector)
+
+
+
+def symptomes_input(message):
+    if message.text.lower() == 'конец':
+        sent = bot.send_message(message.chat.id, text['chooseDiseases'], reply_markup=keyboard.choose_diseases())
+        bot.register_next_step_handler(sent, diseases_input)
+    else:
+        user.setSymptomes(user.getSymptomes()+message.text.split(', '))
+        bot.register_next_step_handler(sent, symptomes_input)
+
+def diseases_input(message):
+    if message.text.lower() == 'конец':
+        sent = bot.send_message(message.chat.id, text['chooseGeo'])
+        bot.register_next_step_handler(sent, geo_input)
+
+    else:
+        user.setDiseases(user.getDiseases() + message.text.split(', '))
+        bot.register_next_step_handler(sent, diseases_input)
+
+
+
+
+@bot.message_handler(content_types=["location"])
+def geo_input(message):
+    if message.location is not None:
+        print(message.location)
+        print("latitude: %s; longitude: %s" % (message.location.latitude, message.location.longitude)) #широта долгота
+        user.setAddress([message.location.latitude, message.location.longitude])
+        id = message.chat.id
+        user_db.create_request(id, user_db.getName(id), user_db.getSurName(id), user_db.getMiddleName(id), user_db.getAge(id), user.getSymptomes(), user.getDiseases(), [message.location.latitude, message.location.longitude])
+    else:
+        sent = bot.send_message(message.chat.id, text['NoneGeo'])
+        bot.register_next_step_handler(sent, geo_input)
+
 
 
 
@@ -69,27 +93,21 @@ def main(message):
 @bot.message_handler(func=lambda message: True)
 def menu_selector(message):
     if message.text == '🏥Обращение🏥':
-            sent = bot.send_message(message.chat.id, text['back'], reply_markup=keyboard.main())
-            bot.register_next_step_handler(sent, menu_selector)
+            sent = bot.send_message(message.chat.id, text['chooseSymptomes'], reply_markup=keyboard.choose_symptome())
+            bot.register_next_step_handler(sent, symptomes_input)
 
     elif message.text == '🎤Голосовое обращение🏥':
-        id = message.chat.id
-        sent = bot.send_message(id, text['calibration'], reply_markup=keyboard.main())
-
-        bot.register_next_step_handler(sent, menu_selector)
+        pass
 
     elif message.text == '⚙Настройки':
         pass
     else:
-        sent = bot.send_message(message.chat.id, text['wrong'], reply_markup=keyboard.main())
+        sent = bot.send_message(message.chat.id, text['wrongMessageInput'], reply_markup=keyboard.main())
         bot.register_next_step_handler(sent, menu_selector)
 
 
 def checkForRussian(text):
-    print('Text= ', text)
     for i in text.replace(" ", "").upper():
-        print('i=', i)
-        print(ord(i))
         if 0 <= ord(i)-1040 <= 31:
             continue
         else:
@@ -98,24 +116,25 @@ def checkForRussian(text):
 
 def symptomes(message):
     bot.send_message(message.chat.id, text['chooseSymptomes'],reply_markup=keyboard.choose_symptome())
-def info(message):
-    bot.send_message(message.from_user.id, text['info']
-                     +"\n"+text['surname']+surName+'\n'+text['firstname']+firstName+'\n'+
-                     text['middlename']+middleName+'\n'+text['age']+Age+'\n'+text[''])
+
 
 def getGender(message):
     if checkForRussian(message.text):
         #не включены гендеры-пулеметы
         user.setGender(1 if message.text == "Мужской" else 0)
 
-        bot.send_message(message.from_user.id,f"{text['info']} \n\n "
+        sent = bot.send_message(message.from_user.id,f"{text['info']} \n\n "
                                               f"{text['surname']} {user.getSurname()}\n"
                                               f"{text['firstname']}{user.getName()} \n"
                                               f"{text['middlename']}{user.getMiddleName()}\n"
                                               f"{text['age']} {user.getAge()}\n"
-                                              f"{text['gender']}{user.getGender()}"
-                         , reply_markup=keyboard.correctInfo())
+                                              f"{text['gender']}{'мужской' if user.getGender() == 1 else 'женский'}"
+                                ,reply_markup=keyboard.main())
+        #без болезней, это костыль
+        user_db.create(message.chat.id, user.getName(), user.getSurname(), user.getMiddleName(), user.getAge(),
+        user.getGender()) #list(set(user.getDiseases())),
 
+        bot.register_next_step_handler(sent, menu_selector)
     else:
         bot.send_message(message.from_user.id, text['wrongMessageInput'])
         bot.register_next_step_handler(message, getGender)
