@@ -16,20 +16,6 @@ class keyboard:
 
         return list_kb
 
-        # keyboard = InlineKeyboardMarkup()
-        # keyboard.row(
-        #     InlineKeyboardButton(symptomes[0], callback_data=symptomes[0]),
-        #     InlineKeyboardButton(symptomes[1], callback_data=symptomes[1]),
-        #     InlineKeyboardButton(symptomes[2], callback_data=symptomes[2]),
-        # )
-        # keyboard.row(
-        #     InlineKeyboardButton('EUR', callback_data='get-EUR'),
-        #     InlineKeyboardButton('RUR', callback_data='get-RUR'),
-        # #     InlineKeyboardButton('RUR', callback_data='get-RUR'),
-        # # )
-        # return keyboard
-
-
     @staticmethod
     def choose_diseases():
         Array = list()

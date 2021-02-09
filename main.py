@@ -123,7 +123,7 @@ def geo_input(message):
 #         info = {'name':'Валерий', 'surname':"Павлов", "middlename":"Петрович", "gender":"мужской","age":25}
 
         geo = geo_to_url(message.location.latitude, message.location.longitude)
-        #unworking
+        # unworking
         user_db.create_request(ID, info['name'], info['surname'], info['middlename'],
                                info['age'], info['gender'], user.getSymptomes(), user.getDiseases(),
                                geo)

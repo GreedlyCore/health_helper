@@ -12,6 +12,8 @@ CREATE TABLE `requests` (
   PRIMARY KEY (`ID`)
 )
 
+#
+
 CREATE TABLE `users` (
   `id_tg` varchar(45) NOT NULL,
   `name` varchar(45) DEFAULT NULL,

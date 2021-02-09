@@ -27,6 +27,7 @@ class user:
     def setGender(self, gender):
         self.gender = gender
 
+
     def getSurname(self):
         return self.surname
     def getName(self):
