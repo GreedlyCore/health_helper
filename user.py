@@ -8,6 +8,9 @@ class user:
         self.address = None
         self.gender = None
         self.diseases = []
+        self.symptomes = None
+        self.address = None
+        self.gender = None
     def setSurname(self, surname):
         self.surname = surname
     def setName(self, name):
