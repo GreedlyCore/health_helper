@@ -8,10 +8,7 @@ File = open("TOKEN", "r").read()
 bot = telebot.TeleBot(File)
 user = user()
 def checkForRussian(text):
-    print('Text= ', text)
     for i in text.replace(" ", "").upper():
-        print('i=', i)
-        print(ord(i))
         if 0 <= ord(i)-1040 <= 31:
             continue
         else:
@@ -33,33 +30,36 @@ def getTextMessages(message):
     bot.send_message(message.from_user.id, text["greet"])
     bot.register_next_step_handler(message, getInitials)
 
-def gender(message):
+def getGender(message):
     if len(message.text) != 1:
         bot.send_message(message.from_user.id, text['wrongMessageInput'])
-        bot.register_next_step_handler(message, gender)
+        bot.register_next_step_handler(message, getGender)
     elif not message.text.isalpha():
         user.setGender(message.text)
         print(user.getGender())
         bot.send_message(message.from_user.id, text['info']
-                         + "\n" + text['surname'] + str(user.getSurname()) + '\n' + text['firstname'] + str(user.getName()) + '\n' +
-                         text['middlename'] + str(user.getMiddleName()) + '\n' + text['age'] + str(user.getAge()) + '\n' + text['gender'] + str(user.getGender()), reply_markup=keyboard.correctInfo())
+                         + "\n" + text['surname'] + str(user.getSurname()) + '\n' +
+                         text['firstname'] + str(user.getName()) + '\n' +
+                         text['middlename'] + str(user.getMiddleName()) + '\n' +
+                         text['age'] + str(user.getAge()) + '\n' +
+                         text['gender'] + str(user.getGender()), reply_markup=keyboard.correctInfo())
 
-def age(message):
+def getAge(message):
     try:
         if int(message.text) > 2:
             if int(message.text) <= 130:
                 user.setAge(int(message.text))
-                bot.send_message(message.from_user.id, text['genderInput'])
-                bot.register_next_step_handler(message, gender)
+                bot.send_message(message.from_user.id, text['genderInput'], reply_markup=keyboard.gender())
+                bot.register_next_step_handler(message, getGender)
             else:
                 bot.send_message(message.from_user.id, text['wrongMessageInput'])
-                bot.register_next_step_handler(message, age)
+                bot.register_next_step_handler(message, getAge)
         else:
             bot.send_message(message.from_user.id, text['ageInput'])
-            bot.register_next_step_handler(message, age)
+            bot.register_next_step_handler(message, getAge)
     except:
         bot.send_message(message.from_user.id, text['wrongMessageInput'])
-        bot.register_next_step_handler(message, age)
+        bot.register_next_step_handler(message, getAge)
 
 def getInitials(message):
     if len(message.text.split()) == 3 and message.text.replace(" ", "").isalpha() and checkForRussian(message.text):
@@ -67,7 +67,7 @@ def getInitials(message):
         user.setName(message.text.split()[1])
         user.setMiddleName(message.text.split()[2])
         bot.send_message(message.from_user.id, text['ageInput'])
-        bot.register_next_step_handler(message, age)
+        bot.register_next_step_handler(message, getAge)
     else:
         bot.send_message(message.from_user.id, text['wrongMessageInput'])
         bot.register_next_step_handler(message, getInitials)

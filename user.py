@@ -35,6 +35,4 @@ class user:
     def getSymptomes(self):
         return self.symptomes
     def getGender(self):
-        if str(self.gender) == str(1):
-            return 'мужской'
-        return 'женский'
+        return self.gender
