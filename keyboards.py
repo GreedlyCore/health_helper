@@ -23,6 +23,7 @@ class keyboard:
        kb.row('💊Запрос', 'Голосовое обращение')
        kb.row('Настройки')
        return kb
+
     @staticmethod
     def select_gender():
         kb = ReplyKeyboardMarkup(True)

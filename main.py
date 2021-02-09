@@ -22,12 +22,7 @@ from os import getcwd
 from user import user
 
 
-
-
-
-
 bot = telebot.TeleBot(TOKEN)
-
 
 class user:
     def __init__(self, name, surname, patronymic, age, symptoms, address):
@@ -37,20 +32,7 @@ class user:
         self.age = 'не заполнено'
         self.symptoms = 'не заполнено'
         self.address = "не заполнено"
-
-
-
-
-@bot.message_handler(commands=['start'])
-def main(message):
-    sent = bot.send_message(message.chat.id, text['greet'], reply_markup=keyboard.main())
-
-    # register for new users
-    if message.chat.id not in user_db.get_users_id():
-        registration()
-        # user_db.create(message.chat.id)
-
-    bot.register_next_step_handler(sent, menu_selector)
+user = user()
 
 
 # многоразовый отклик на кнопки в клаве
@@ -62,6 +44,24 @@ def callback_query(call):
     theme = call.data.split()[1:-1]
     article_id = call.data.split()[-1]
 
+
+
+
+
+
+@bot.message_handler(commands=['start'])
+def main(message):
+
+
+    # register for new users
+    if message.chat.id not in user_db.get_users_id():
+        #-----------------------------------------------------REGISTRATION---------------------------------------------#
+        sent = bot.send_message(message.chat.id, text['greet'])
+        bot.register_next_step_handler(sent, getInitials)
+        user_db.create(message.chat.id, user.getName(), user.getSurname(), user.getMiddleName(), user.getAge(),
+                       diseases, user.getGender())
+
+    bot.register_next_step_handler(sent, menu_selector)
 
 
 
@@ -85,42 +85,6 @@ def menu_selector(message):
         bot.register_next_step_handler(sent, menu_selector)
 
 
-bot.polling(none_stop=True, interval=0)
-
-
-
-
-@bot.message_handler(commands=['start'])
-def main(message):
-
-
-    # register for new users
-    if message.chat.id not in user_db.get_users_id():
-        #-----------------------------------------------------REGISTRATION---------------------------------------------#
-        sent = bot.send_message(message.chat.id, text['greet'])
-        bot.register_next_step_handler(sent, getInitials)
-
-
-
-        user_db.create(message.chat.id, user.getName(), user.getSurname(), user.getMiddleName(), user.getAge(), diseases, user.getGender())
-
-    bot.register_next_step_handler(sent, menu_selector)
-
-
-# многоразовый отклик на кнопки в клаве
-@bot.callback_query_handler(func=lambda call: True)
-def callback_query(call):
-    bot.answer_callback_query(callback_query_id=call.id, text=choice(text['rated_callback']))
-
-    mark = float(call.data.split()[0])
-    theme = call.data.split()[1:-1]
-    article_id = call.data.split()[-1]
-
-
-
-
-
-user = user()
 def checkForRussian(text):
     print('Text= ', text)
     for i in text.replace(" ", "").upper():
@@ -139,8 +103,6 @@ def info(message):
                      +"\n"+text['surname']+surName+'\n'+text['firstname']+firstName+'\n'+
                      text['middlename']+middleName+'\n'+text['age']+Age+'\n'+text[''])
 
-
-
 def getGender(message):
     if checkForRussian(message.text):
         #не включены гендеры-пулеметы
@@ -157,8 +119,6 @@ def getGender(message):
     else:
         bot.send_message(message.from_user.id, text['wrongMessageInput'])
         bot.register_next_step_handler(message, getGender)
-
-
 
 def getAge(message):
     try:
@@ -192,6 +152,4 @@ def getInitials(message):
 
 
 
-
-
-
+bot.polling(none_stop=True, interval=0)
