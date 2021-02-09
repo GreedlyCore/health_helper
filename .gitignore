@@ -69,6 +69,7 @@ instance/
 .scrapy
 
 const.py
+geo.py
 # Sphinx documentation
 docs/_build/
 
