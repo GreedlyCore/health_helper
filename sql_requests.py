@@ -21,9 +21,9 @@ class user_db:
     def create_request(id, name, surname, middlename, age, gender, symptomes, diseases, geo):
         mycursor = user_db.mydb.cursor()
         sql = "INSERT INTO reports (id_tg, name, surname, middlename, age, symptomes, diseases, gender, time, place) VALUES (%s,%s, %s, %s, %s, %s, %s, %s, %s, %s)"
-        val = (id, name, surname, middlename, age, symptomes, symptomes, diseases, gender, datetime.now().strftime('%Y-%m-%d %H:%M:%S'), geо)
-        mycursor.execute(sql, val)
-        user_db.mydb.commit()
+        #val = (id, name, surname, middlename, age, symptomes, diseases, gender, datetime.now().strftime('%Y-%m-%d %H:%M:%S'), geо)
+        #mycursor.execute(sql, val)
+        #user_db.mydb.commit()
 
 
     @staticmethod
@@ -41,11 +41,11 @@ class user_db:
         return cursor.fetchone()[0]
     @staticmethod
     def getMainInfo(ID):
-        cursor = user_db.mydb.cursor()
-        request = mycursor.execute(f"SELECT * FROM users WHERE id_telegram={id}")
+        mycursor = user_db.mydb.cursor()
+        request = f"SELECT name,surname,middlename,age,gender FROM users WHERE id_tg={ID}"
         mycursor.execute(request)
         val = ("name", "surname", "middlename", "age", "gender")
-        return dict(zip(val,[i[0] for i in mycursor.fetchall()]))
+        return dict(zip(val,mycursor.fetchone()))
 
     @staticmethod
     def getMiddleName(ID):

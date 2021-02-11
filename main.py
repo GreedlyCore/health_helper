@@ -34,7 +34,7 @@ def callback_query(call):
 def main(message):
 
     # registration for new users
-    if str(message.json['from']['id']) not in user_db.get_users_id():
+    if message.json['from']['id'] not in user_db.get_users_id():
         sent = bot.send_message(message.chat.id, text['greet_new'])
         bot.register_next_step_handler(sent, getInitials)
         print('User created')
@@ -118,15 +118,14 @@ def getGender(message):
 def geo_input(message):
     if message.location is not None:
         # широта долгота
-        ID = str(message.json['from']['id'])
-        info = user_db.getMainInfo(str(message.json['from']['id']))
+        ID = int(message.json['from']['id'])
+        info = user_db.getMainInfo(ID)
 #         info = {'name':'Валерий', 'surname':"Павлов", "middlename":"Петрович", "gender":"мужской","age":25}
 
         geo = geo_to_url(message.location.latitude, message.location.longitude)
         # unworking
         user_db.create_request(ID, info['name'], info['surname'], info['middlename'],
-                               info['age'], info['gender'], user.getSymptomes(), user.getDiseases(),
-                               geo)
+                               info['age'], info['gender'], user.getSymptomes(), user.getDiseases(),str(geo))
         sent = bot.send_message(message.chat.id, text['request_sended'])
         for DR in DOCTOR_CHATS_ID:
             bot.send_message(DR, f"{text['new_request']} \n\n "
@@ -135,8 +134,8 @@ def geo_input(message):
                                  f"{text['middlename']}{info['middlename']}\n"
                                  f"{text['age']} {info['age']}\n"
                                  f"{text['gender']}{info['gender']}\n\n"
-                                 f"Жалобы/травмы:{' '.join(user.getDiseases())}\n\n"
-                                 f"Симптомы:{' '.join(user.getSymptomes())}\n\n"
+                                 f"Жалобы/травмы: {' '.join(user.getDiseases())}\n\n"
+                                 f"Симптомы: {' '.join(user.getSymptomes())}\n\n"
                                  f"Местоположение:\n{geo}")
 
 
